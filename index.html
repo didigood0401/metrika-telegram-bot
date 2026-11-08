@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Метрика для Telegram-бота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f4f2;--pn:#fff;--ink:#171b20;--mut:#58616b;--y:#ffcc00;--acc:#2481cc;--ok:#1a7f53;--tn:#e6e8e4}
+*{box-sizing:border-box;margin:0}
+body{font:400 17px/1.5 "Golos Text",Arial,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
+button{font:inherit;cursor:pointer}
+.w{max-width:1120px;margin:0 auto;padding:36px 16px 50px}
+h1{font-size:clamp(34px,5vw,58px);line-height:1.05;font-weight:700;letter-spacing:-.02em}
+.lead{font-size:20px;margin:14px 0 30px;max-width:740px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.st{background:var(--pn);padding:18px;min-height:250px;display:flex;flex-direction:column;opacity:.45;transform:translateY(8px);transition:opacity .5s,transform .6s cubic-bezier(.22,1,.36,1),background .4s}
+.st.on{opacity:1;transform:none}
+.st.dn{background:#e7f3ec}
+.st h2{font-size:20px;line-height:1.2;font-weight:700;margin-bottom:8px}
+.st p{font-size:16px}
+.v{margin-top:auto;padding-top:12px;font-size:14px;font-weight:600;color:var(--acc);word-break:break-all;min-height:50px}
+.row{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.btn{min-height:50px;padding:0 24px;background:var(--y);border:0;font-weight:700;transition:transform .2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{background:var(--tn);color:var(--mut);cursor:default}
+#msg{font-size:16px;color:var(--ok);font-weight:600}
+h2.h{font-size:clamp(26px,3.4vw,38px);line-height:1.15;margin:52px 0 14px;letter-spacing:-.01em}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
+ul{padding-left:20px}li{margin:7px 0}
+pre{background:var(--ink);color:#e9edf0;padding:16px;font:14px/1.55 Consolas,Menlo,monospace;overflow:auto}
+.case{background:var(--y);padding:24px;margin-top:40px}
+.case h2{font-size:clamp(24px,3vw,32px);line-height:1.15;margin-bottom:8px}
+.case a{color:var(--ink);font-weight:600}
+.nt{font-size:15px;color:var(--mut);margin-top:16px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+@media(max-width:820px){.flow,.two{grid-template-columns:1fr}.st{min-height:0}.v{min-height:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Метрика видит, что сделали в боте</h1>
+<p class="lead">Telegram не пускает счётчик внутрь бота. Поэтому связь строится через короткую страницу-переход и серверную отправку целей. Нажмите и посмотрите путь одного клиента.</p>
+<div class="flow" id="fl">
+<section class="st"><h2>Клик в Директе</h2><p>Пользователь приходит на страницу с кодом Метрики.</p><div class="v" id="v0"></div></section>
+<section class="st"><h2>Страница-переход</h2><p>Счётчик присваивает ClientID, ссылка передаёт его в бот.</p><div class="v" id="v1"></div></section>
+<section class="st"><h2>Бот запомнил клиента</h2><p>Команда /start получает метку и связывает её с пользователем.</p><div class="v" id="v2"></div></section>
+<section class="st"><h2>Цель в Метрике</h2><p>Заявка в боте уходит на сервер и загружается как конверсия.</p><div class="v" id="v3"></div></section>
+</div>
+<div class="row"><button class="btn" id="go" type="button">Запустить клиента</button><span id="msg" aria-live="polite"></span></div>
+<h2 class="h">Что будет сделано</h2>
+<div class="two">
+<ul><li>Счётчик и цели: старт бота, ключевые шаги, заявка или оплата</li><li>Страница-переход с передачей ClientID и UTM в бот</li><li>Доработка бота: сохранение метки и отправка событий</li><li>Загрузка конверсий в Метрику через API</li><li>Проверка всей цепочки тестовыми заявками</li><li>Цели, готовые для выбора в кампании Директа</li></ul>
+<pre>// /start c1742_utm → связь с клиентом
+bot.start(ctx =&gt; save(ctx.from.id, ctx.startPayload))
+
+// заявка в боте → конверсия
+onLead(user =&gt; uploadOffline({
+  ClientId: user.clientId,
+  Target: 'bot_lead',
+  DateTime: now()
+}))</pre>
+</div>
+<div class="case"><h2>Похожая задача в реальном проекте</h2><p>Для лендинга <a href="https://tr555.ru/landing/scenario/" target="_blank" rel="noopener">tr555.ru</a> настроила 6 целей Яндекс Метрики и передачу UTM и yclid дальше на сайт, затем проверила срабатывание каждой цели на живом сайте и в отчётах.</p></div>
+<p class="nt">Демо: значения условные. Для оплаты за конверсии Директу нужен достаточный объём целей, порог зависит от стратегии и настроек кампании.</p>
+</div>
+<script>
+var S=document.querySelectorAll('.st'),$=function(i){return document.getElementById(i)},b=$('go');
+function rd(n){var s='';while(s.length<n)s+=Math.floor(Math.random()*10);return s}
+var T=[];function at(ms,f){T.push(setTimeout(f,ms))}
+function reset(){T.forEach(clearTimeout);T=[];S.forEach(function(e,i){e.classList.remove('on','dn');$('v'+i).textContent=''});$('msg').textContent=''}
+b.onclick=function(){reset();b.disabled=true;var cid='17'+rd(14),ad=rd(8),V=['yclid: '+ad,'ClientID: '+cid,'t.me/bot?start=c'+cid.slice(0,10),'bot_lead: отправлено'];
+ V.forEach(function(v,i){at(250+i*1050,function(){S[i].classList.add('on');$('v'+i).textContent=v;if(i)S[i-1].classList.add('dn')})});
+ at(250+4*1050,function(){S[3].classList.add('dn');$('msg').textContent='Конверсия связана с рекламным кликом';b.disabled=false;b.textContent='Ещё раз'})};
+S[0].classList.add('on');
+</script>
+</body>
+</html>
